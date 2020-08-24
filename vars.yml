@@ -1,0 +1,107 @@
+---
+
+desktop: ubuntu-desktop
+
+git:
+  user: example
+  email: example@gmail.com
+
+trusted_certs:
+  - url: blah
+    sha256: bbbbbb
+
+common_pkgs:
+  - make
+  - gcc
+  - apt-transport-https
+  - software-properties-common
+  - xclip
+  - open-vm-tools-desktop
+  - vim
+  - ca-certificates
+  - curl
+  - guake
+  - terminator
+  - tmux
+  - fonts-powerline
+  - p11-kit
+  - jq
+  - wget
+  - gnome-shell-extensions
+  - gnome-menus
+  - gir1.2-gmenu-3.0
+  - gnome-color-manager
+  - gnome-tweaks
+  - papirus-icon-theme
+  - openssh-server
+  - openssh-client
+  - libssl-dev
+  - dnsutils
+  - curl
+  - wget
+  - gnupg
+  - git
+  - git-extras
+  - whois
+  - traceroute
+  - htop
+  - zip
+  - unzip
+  - p7zip
+  - hexedit
+  - debian-goodies
+  - debsums
+  - debsecan
+
+extras:
+  apt:
+    - arc-theme
+  # - ngrok
+  # - file-roller
+  # - network-manager
+  # - network-manager-gnome
+  # - network-manager-openvpn
+  # - network-manager-openvpn-gnome
+  # - resolvconf
+  # - zsh
+  # - nftables
+  # - debian-archive-keyring
+  # - libpam-tmpdir
+  # - apt-listbugs
+  # - dnsmasq
+  go:
+    - github.com/jingweno/ccat
+  npm: []
+  pip: []
+  snap:
+    - vscode
+    - kubectl
+    - go
+    - firefox
+    - aws-cli
+    - helm
+    - docker
+    - terraform
+    - postman
+  bins:
+    - https://storage.googleapis.om/skaffold/releases/lastest/skaffold-linux-amd64
+    
+
+extra_repos: []
+  # - https://apt.releases.hashicorp.com
+  # - https://download.docker.com/linux/ubuntu
+
+
+python:
+  pip:
+    extra_index_url: abc
+    trusted_host: dddd
+  default: "3.6.6"
+  versions: 
+    - "3.6.6"
+
+
+java:
+  default: 8
+  versions:
+    - 8

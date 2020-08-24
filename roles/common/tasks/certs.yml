@@ -1,0 +1,19 @@
+---
+
+- name: Trusted Certs | tmpdir
+  file:
+    path: /tmp/tcerts
+    state: directory
+
+- name: Trusted Certs | Download
+  get_url:
+    url: "{{ item.url }}"
+    dest: "/tmp/tcerts/"
+    validate_certs: no
+  loop: "{{ trusted_certs }}"  
+
+# TODO test this
+- name: Trusted Certs | Trust
+  shell: trust anchor --store "/tmp/tcerts/*.pem"
+  become: yes
+  when: "{{ trusted_certs }}"

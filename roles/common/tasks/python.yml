@@ -1,0 +1,59 @@
+---
+- name: python | pyenv | Install
+  git:
+    repo: https://github.com/pyenv/pyenv.git
+    dest: ~/.pyenv
+    accept_hostkey: yes
+    depth: '1'
+
+
+- name: python | pyenv | add to PATH
+  shell: echo 'export PATH=$PATH:~/.pyenv/bin' >> ~/.bashrc
+
+
+- name: python | pyenv | executable
+  file:
+    path: ~/.pyenv/bin/pyenv
+    state: touch
+    mode: u=rwx,g=r,o=r
+
+
+- name: python | pyenv | symlink binary
+  file:
+    src: '/home/{{ user }}/.pyenv/bin/pyenv'
+    dest: /usr/local/bin/pyenv
+    owner: '{{ user }}'
+    group: '{{ user }}'
+    state: link
+  become: yes
+
+
+- name: python | pyenv | Get installed Pythons
+  shell: pyenv versions --bare
+  register: pyenv_installed_pythons
+
+
+- name: python | pyenv | Install Pythons
+  shell: pyenv install -s {{ item }}
+  with_items: "{{ python.versions }}"
+  when: "item not in pyenv_installed_pythons.stdout_lines"
+
+
+- name: python | pyenv | Get default python
+  shell: pyenv global
+  register: pyenv_global_python
+
+  
+- name: python | pyenv | Default Python
+  shell: pyenv global {{ python.default }}
+  when: "python.default != pyenv_global_python"
+
+- name: python | pip | dir
+  file:
+    path: ~/.pip
+    state: directory
+
+- name: python | pip | configure
+  template:
+    src: pip.conf
+    dest: ~/.pip/pip.conf

@@ -1,0 +1,240 @@
+---
+
+- name: Common | Common Packages
+  apt:
+    name: "{{ common_pkgs }}"
+    update_cache: yes
+    install_recommends: no
+  become: yes
+
+# - name: Common | Package Repos
+#   apt_repository:
+#     repo: "{{ extra_repos }}"
+#   become: true
+
+- name: Common | Install GUI Desktop
+  apt:
+    name: "{{ desktop }}"
+    install_recommends: no
+  become: yes
+  register: desktop_installed
+
+- name: Common | Extra Packages | apt
+  apt: 
+    name: "{{ extras.apt }}"
+  become: yes
+
+# - name: Common | Extra Packages | snap
+#   snap:
+#     name: "{{ extras.snap }}"
+#   become: yes
+
+
+
+# - name: Common | Extra Packages | npm
+#   apt: 
+#     name: "{{ extras.npm }}"
+#   become: yes
+
+# - name: Common | Extra Packages | go get
+#   apt: 
+#     name: "{{ extras.go }}"
+#   become: yes
+
+# - name: Common | Extra Packages | pip
+  # pip: name='{{item}}' executable=pip3 state=latest
+  # loop:
+  #   - ansible # Yo dawg i herd you like Ansible so we put a Ansible in yo Ansible so you can automate while u automate
+  #   - backupcpy
+  #   - pipenv
+  #   - Django
+  #   - docker-compose
+  #   - awscli
+  #   - notebook
+  #   - cloudsmith-cli
+  # become: true
+
+
+
+# Ensure relevant APT keys are present on the system to support extra repositories added later.
+- name: Add apt keys
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: '{{item}}'
+  loop:
+    - '9FD3B784BC1C6FC31A8A0A1C1655A0AB68576280' # NodeSource
+    - '2EBF997C15BDA244B6EBF5D84773BD5E130D1D45' # Spotify
+    - 'DB085A08CA13B8ACB917E0F6D938EC0D038651BD' # Slack
+    # - '8ED17AF5D7E675EB3EE3BCE98AC3B29174885C03' # AdoptOpenJDK
+    # - '9DC858229FC7DD38854AE2D88D81803C0EBFCD88' # Docker
+    - '8756C4F765C9AC3CB6B85D62379CE192D401AB61' # Insomnia
+    - '72ECF46A56B4AD39C907BBB71646B01B86E50310' # Yarn
+    - '4CCA1EAF950CEE4AB83976DCA040830F7FAC5991' # Google-1
+    - 'EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796' # Google-2
+    - '15058500A0235D97F5D10063B188E2B695BD4743' # deb.sury.org
+    - '0A0FAB860D48560332EFB581B75442BBDE9E3B09' # Atom
+    - '54A647F9048D5688D7DA2ABE6A030B21BA07F4FB' # Google Cloud SDK
+    - 'C80E383C3DE9F082E01391A0366C67DE91CA5D5F' # Lynis
+    - 'DBA36B5181D0C816F630E889D980A17457F6FB06' # Signal
+    # - 'AEE35447B5D3E4A69860622702F762CA6730E6A7' # libkafe
+    # - 'E162F504A20CDF15827F718D4B7C549A058F8B6B' # MongoDB v4.2 rel
+    # - '' # terraform
+  become: true
+
+# Enable extra repositories needed on the system. Mostly development, productivity etc.
+- name: Enable extra repos
+  apt_repository: filename='{{item.file}}' repo='{{item.repo}}' state=present
+  loop:
+    # - {file: 'adoptopenjdk', repo: 'deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ {{ansible_distribution_release}} main'}
+    - {file: 'spotify', repo: 'deb http://repository.spotify.com stable non-free'} # HTTP :(
+    - {file: 'slack', repo: 'deb https://packagecloud.io/slacktechnologies/slack/debian/ jessie main'}
+    # - {file: 'docker', repo: 'deb [arch=amd64] https://download.docker.com/linux/debian {{ansible_distribution_release}} stable'}
+    - {file: 'insomnia', repo: 'deb https://dl.bintray.com/getinsomnia/Insomnia /'}
+    - {file: 'google-chrome', repo: 'deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main'}
+    - {file: 'lynis', repo: 'deb https://packages.cisofy.com/community/lynis/deb/ stable main'}
+    - {file: 'google-cloud-sdk', repo: 'deb https://packages.cloud.google.com/apt cloud-sdk main'}
+    - {file: 'signal', repo: 'deb [arch=amd64] https://updates.signal.org/desktop/apt xenial main'}
+    # - {file: 'libkafe', repo: 'deb https://dl.cloudsmith.io/public/kafe/libkafe/deb/debian {{ansible_distribution_release}} main'}
+    # - {file: 'mongodb-4.2', repo: 'deb http://repo.mongodb.org/apt/debian {{ansible_distribution_release}}/mongodb-org/4.2 main'}
+    # - {file: 'terraform', repo: 'deb [arch=amd64] https://apt.releases.hashicorp.com {{ansible_distribution_release}} main'}
+  become: true
+
+- name: Ensure my packages
+  package: name='{{item}}' state=latest
+  loop:
+    - lynis
+    # - docker-ce
+    - git
+    - git-extras
+    - hub
+    # - diff-so-fancy
+    - tmux
+    - tmuxinator
+    - spotify-client
+    - slack-desktop
+    - telegram-desktop
+    - signal-desktop
+    - google-chrome-stable
+    # - insomnia
+    - fzf
+    # - google-cloud-sdk
+    # - virt-manager
+    # - kafe-cli
+    # - composer
+    # - linux-perf-5.6
+    # - valgrind
+    # - sshpass
+    # - zenmap
+
+  become: true
+
+- name: Ensure system files
+  copy: src='{{item.src}}'  dest='{{item.dest}}' mode='0644' owner='root' group='root'
+  loop:
+    # - {src: menu-icon.svg, dest: /etc/menu-icon.svg} # Used by Arc Menu GNOME extension.
+    # - {src: wallpaper.png, dest: /etc/wallpaper.png} # System default wallpaper
+    - {src: issue, dest: /etc/issue} # System banner
+    - {src: issue.net, dest: /etc/issue.net} # System banner - for network clients
+    - {src: motd, dest: /etc/motd} # User motd
+  become: true
+
+- name: Ensure group "docker" exists
+  group:
+    name: docker
+    state: present
+  become: true
+
+# Ensure own user settings
+- name: Update own user
+  user:
+    name: '{{user}}'
+    groups: docker
+    append: yes
+    # create_home: yes
+    # password: '*' # Initial password is none, account locked
+    # update_password: on_create # Do not reset password from ansible
+  become: true
+
+- name: Ensure home directory has correct permissions
+  file: path='/home/{{user}}/' state=directory mode='0700' owner='{{user}}' group='{{user}}'
+  become: true
+
+- name: Create ~/.ssh/
+  file: path='/home/{{user}}/.ssh' state=directory mode='0700' owner='{{user}}' group='{{user}}'
+  become: true
+
+- name: Ensure default directories in home
+  file: path='{{item}}' state=directory mode='0700' owner='{{user}}' group='{{user}}'
+  loop:
+    - '/home/{{user}}/dev'
+  become: true
+
+- name: Update DNS
+  template:
+    src: resolv.conf
+    dest: /etc/resolv.conf
+  become: yes
+
+- name: Install fonts
+  copy: src=fonts/ dest=/usr/local/share/fonts
+  become: true
+
+- include: dotfiles.yml
+- include: bash-it.yml
+- include: fzf.yml
+# - include: java.yml
+- include: python.yml
+# - include: certs.yml
+
+- name: Update PATH
+  shell: echo 'export PATH=$PATH:~/.local/bin' >> ~/.bashrc
+
+# # Configure icons in Nautilus for some directories.
+# - name: Set home folder icons
+#   shell: 'gio set -t string {{item.dir}} metadata::custom-icon file://{{item.icon}}'
+#   changed_when: false # Really not that important...
+#   loop:
+#     - {dir: '/home/{{user}}/CLionProjects', icon: '/usr/share/icons/Papirus/64x64/places/folder-cyan-development.svg'}
+#     - {dir: '/home/{{user}}/IdeaProjects', icon: '/usr/share/icons/Papirus/64x64/places/folder-pink-development.svg'}
+#     - {dir: '/home/{{user}}/dots', icon: '/usr/share/icons/Papirus/64x64/places/folder-orange-development.svg'}
+
+
+# - name: Update root user shell
+#   user:
+#     name: root
+#     shell: /bin/zsh
+#   become: true
+
+# - name: Install oh-my-zsh for root
+#   git: repo='https://github.com/ohmyzsh/ohmyzsh' dest=/root/.oh-my-zsh
+#   become: true
+
+# - name: Install oh-my-zsh for self
+#   git: repo='https://github.com/ohmyzsh/ohmyzsh' dest='/home/{{user}}/.oh-my-zsh'
+
+
+# Ensure DCONF profile is present on the system. This deals with desktop customization and defaults.
+# - name: Create /etc/dconf/profile
+#   file: path='/etc/dconf/profile' state=directory mode='0755' owner=root group=root
+#   become: true
+
+# - name: Copy dconf user profile config
+#   copy: src=dconf_profile_user dest=/etc/dconf/profile/user mode='0644' owner=root group=root
+#   become: true
+
+# - name: Create /etc/dconf/db/local.d
+#   file: path='/etc/dconf/db/local.d' state=directory mode='0755' owner=root group=root
+#   become: true
+
+# - name: Update dconf settings
+#   copy: src=dconf_settings.ini dest=/etc/dconf/db/local.d/00-global mode='0644' owner=root group=root
+#   notify: [Update dconf]
+#   become: true
+# # END
+
+# # Configure boot screen
+# - name: Copy plymouthd.conf
+#   copy: src=plymouthd.conf dest=/etc/plymouth/plymouthd.conf mode='0644' owner=root group=root
+#   notify: [Update initramfs]
+#   become: true
+

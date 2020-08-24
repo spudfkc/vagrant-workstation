@@ -1,0 +1,12 @@
+---
+
+- name: Common | bash-it | Clone
+  git:
+    accept_hostkey: yes
+    repo: https://github.com/Bash-it/bash-it.git
+    dest: ~/.bash_it
+    depth: '1'
+
+- name: Common | bash-it | Install
+  shell: ~/.bash_it/install.sh --silent
+  run_once: true

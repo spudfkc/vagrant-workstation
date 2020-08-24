@@ -1,0 +1,27 @@
+---
+
+- name: Dev | dotfiles | root dotfiles
+  template: src='{{item.src}}' dest='{{item.dest}}' mode='0600' owner='root' group='root'
+  loop:
+    - {src: dotfiles/alias, dest: '/root/.alias'}
+    - {src: dotfiles/bashrc, dest: '/root/.bashrc'}
+    - {src: dotfiles/editorconfig, dest: '/root/.editorconfig'}
+    - {src: dotfiles/wgetrc, dest: '/root/.wgetrc'}
+    - {src: dotfiles/curlrc, dest: '/root/.curlrc'}
+    - {src: dotfiles/vimrc, dest: '/root/.vimrc'}
+  become: true
+  
+
+- name: Dev | dotfiles | personal dotfiles
+  template: src='{{item.src}}'  dest='{{item.dest}}' mode='0600' owner='{{user}}' group='{{user}}'
+  loop:
+    - {src: dotfiles/alias, dest: '/home/{{user}}/.alias'}
+    - {src: dotfiles/gitconfig, dest: '/home/{{user}}/.gitconfig'}
+    # - {src: dotfiles/authorized_keys, dest: '/home/{{user}}/.ssh/authorized_keys'}
+    - {src: dotfiles/bashrc, dest: '/home/{{user}}/.bashrc'}
+    - {src: dotfiles/tmux.conf, dest: '/home/{{user}}/.tmux.conf'}
+    - {src: dotfiles/editorconfig, dest: '/home/{{user}}/.editorconfig'}
+    - {src: dotfiles/wgetrc, dest: '/home/{{user}}/.wgetrc'}
+    - {src: dotfiles/gitignore, dest: '/home/{{user}}/.gitignore'}
+    - {src: dotfiles/curlrc, dest: '/home/{{user}}/.curlrc'}
+    - {src: dotfiles/vimrc, dest: '/home/{{user}}/.vimrc'}

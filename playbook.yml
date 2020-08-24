@@ -1,0 +1,33 @@
+---
+
+- hosts: all
+  vars:
+    max_clients: 200
+    user: vagrant 
+  pre_tasks:
+    - include_vars: vars.yml
+    - name: Common | Upgrade
+      become: yes
+      apt:
+        update_cache: yes
+        upgrade: full
+  roles:
+    - role: common
+- hosts: localhost
+  vars:
+    user: ncc 
+  pre_tasks:
+    - include_vars: vars.yml
+    # - name: Common | Upgrade
+    #   become: yes
+    #   apt:
+    #     update_cache: yes
+    #     upgrade: full
+  roles:
+    - role: common
+    # - name: git|includes diff-so-fancy and gitconfig and hub and git-extras
+    # - name: .bashrc
+    # - name: aliases
+    # - name: fzf
+    # - name: python|includes pyenv and pip index extra and certs and extra packages
+    # - name: Tests

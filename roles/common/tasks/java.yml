@@ -1,0 +1,59 @@
+---
+
+- name: java | Add apt keys
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: '8ED17AF5D7E675EB3EE3BCE98AC3B29174885C03'
+  become: yes
+
+
+- name: java | add adopt open jdk repo
+  apt_repository:
+    filename: adoptopenjdk
+    repo: 'deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ {{ansible_distribution_release}} main'
+    mode: '0666'
+  become: yes
+
+
+- name: Dev | Java | Install OpenJDK
+  apt:
+    name: "adoptopenjdk-{{ item }}-openj9"
+  loop: "{{ java.versions }}"
+  become: yes
+
+
+- name: Dev | Java | Set Default Java
+  shell: 'update-alternatives --set java /usr/lib/jvm/java-{{ java.default }}-openjdk-amd64/jre/bin/java'
+  become: yes
+
+
+- name: Dev | Java | Maven
+  apt: 
+    name: maven
+  become: yes
+
+
+- name: Dev | Java | keystore | Convert certs to DER
+  shell: ls -1 /tmp/tcerts/*.pem | xargs -I {} -L 1 openssl x509 -outform der -in /tmp/tcerts/{} -out /tmp/tcerts/{}.der
+  become: yes
+
+
+# - name: Dev | Java | Get Existing Keytool Certs
+#   become: yes
+#   shell: keytool -keystore $JAVA_HOME/lib/security/cacerts -noprompt -storepass changeit -list  | awk '{print $1}' | tr ',' '\n' | grep .der
+#   register: keytool_certs
+#   failed_when: keytool_certs.rc > 1
+
+
+- name: Dev | Java | Configure Java Keytool
+  shell: ls -1 /tmp/tcerts/*.der | xargs -I {} -L 1 keytool -keystore /usr/lib/jvm/java-{{ java.default }}-openjdk-amd64/jre/lib/security/cacerts -noprompt -storepass changeit -import -alias {} -file {}
+  become: yes
+
+
+- name: Dev | Java | Set JAVA_HOME
+  shell: echo 'export JAVA_HOME=/usr/lib/jvm/java-{{ java.default }}-openjdk-amd64/jre' >> ~/.bashrc
+
+
+- name: Dev | Java | Set JAVA_HOME on PATH
+  shell: echo 'export PATH=$PATH:$JAVA_HOME/bin' >> ~/.bashrc
+  

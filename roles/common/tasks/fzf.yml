@@ -1,0 +1,12 @@
+---
+
+- name: Dev | fzf | Clone
+  git:
+    accept_hostkey: yes
+    repo: https://github.com/junegunn/fzf.git
+    dest: ~/.fzf
+    depth: '1'
+
+- name: Dev | fzf | Install
+  shell: ~/.fzf/install --all
+  run_once: true
